@@ -2,11 +2,10 @@
   "name": "realtime-chat-app",
   "version": "1.0.0",
   "description": "Real-time chat app with Next.js and Socket.IO",
-  "main": "server.js",
   "scripts": {
-    "dev": "node server.js",
+    "dev": "next dev",
     "build": "next build",
-    "start": "NODE_ENV=production node server.js",
+    "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {

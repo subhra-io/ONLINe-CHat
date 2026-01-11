@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
-export default function MessageInput({ onSendMessage }) {
+export default function MessageInput({ onSendMessage, isConnected }) {
   const [message, setMessage] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (message.trim()) {
+    if (message.trim() && isConnected) {
       onSendMessage(message);
       setMessage('');
     }
@@ -25,15 +25,16 @@ export default function MessageInput({ onSendMessage }) {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="Type your message..."
+          placeholder={isConnected ? "Type your message..." : "Connecting..."}
           className="message-input"
           rows="1"
           maxLength={500}
+          disabled={!isConnected}
         />
         <button 
           type="submit" 
           className="send-button"
-          disabled={!message.trim()}
+          disabled={!message.trim() || !isConnected}
         >
           Send
         </button>

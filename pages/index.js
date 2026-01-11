@@ -8,7 +8,7 @@ export default function Home() {
   const [username, setUsername] = useState('');
   const [isJoined, setIsJoined] = useState(false);
   const [messages, setMessages] = useState([]);
-  const [onlineUsers, setOnlineUsers] = useState([]);
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     socketInitializer();
@@ -18,11 +18,21 @@ export default function Home() {
     };
   }, []);
 
-  const socketInitializer = () => {
-    socket = io();
+  const socketInitializer = async () => {
+    await fetch('/api/socket');
+    
+    socket = io({
+      path: '/api/socket',
+      addTrailingSlash: false,
+    });
 
     socket.on('connect', () => {
       console.log('Connected to server');
+      setIsConnected(true);
+    });
+
+    socket.on('disconnect', () => {
+      setIsConnected(false);
     });
 
     socket.on('receive-message', (data) => {
@@ -50,14 +60,14 @@ export default function Home() {
 
   const joinChat = (e) => {
     e.preventDefault();
-    if (username.trim()) {
+    if (username.trim() && isConnected) {
       socket.emit('join-room', username);
       setIsJoined(true);
     }
   };
 
   const sendMessage = (message) => {
-    if (message.trim()) {
+    if (message.trim() && isConnected) {
       socket.emit('send-message', { message });
     }
   };
@@ -67,6 +77,9 @@ export default function Home() {
       <div className="login-container">
         <div className="login-box">
           <h1>Real-Time Chat</h1>
+          <div className={`connection-status ${isConnected ? 'connected' : 'disconnected'}`}>
+            {isConnected ? '🟢 Connected' : '🔴 Connecting...'}
+          </div>
           <form onSubmit={joinChat}>
             <input
               type="text"
@@ -76,7 +89,11 @@ export default function Home() {
               className="username-input"
               maxLength={20}
             />
-            <button type="submit" className="join-btn">
+            <button 
+              type="submit" 
+              className="join-btn"
+              disabled={!isConnected || !username.trim()}
+            >
               Join Chat
             </button>
           </form>
@@ -91,6 +108,7 @@ export default function Home() {
         messages={messages} 
         username={username} 
         onSendMessage={sendMessage}
+        isConnected={isConnected}
       />
     </div>
   );

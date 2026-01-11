@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import MessageInput from './MessageInput';
 
-export default function Chat({ messages, username, onSendMessage }) {
+export default function Chat({ messages, username, onSendMessage, isConnected }) {
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -16,7 +16,12 @@ export default function Chat({ messages, username, onSendMessage }) {
     <div className="chat-wrapper">
       <div className="chat-header">
         <h2>Chat Room</h2>
-        <span className="username-display">Welcome, {username}!</span>
+        <div className="header-info">
+          <span className="username-display">Welcome, {username}!</span>
+          <div className={`connection-status ${isConnected ? 'connected' : 'disconnected'}`}>
+            {isConnected ? '🟢 Connected' : '🔴 Disconnected'}
+          </div>
+        </div>
       </div>
       
       <div className="messages-container">
@@ -47,7 +52,7 @@ export default function Chat({ messages, username, onSendMessage }) {
         <div ref={messagesEndRef} />
       </div>
       
-      <MessageInput onSendMessage={onSendMessage} />
+      <MessageInput onSendMessage={onSendMessage} isConnected={isConnected} />
     </div>
   );
 }
